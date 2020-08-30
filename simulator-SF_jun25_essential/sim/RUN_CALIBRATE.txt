@@ -1,0 +1,1 @@
+python3 calibrate_SF.py --country "US" --area "SF" --mob "lib/mobility/San_Francisco_settings_20.pk" --start "2020-03-04" --end "2020-03-19"

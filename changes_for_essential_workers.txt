@@ -1,0 +1,62 @@
+1. downsize the data:
+	a. town_generator.py: change downsample_population/downsample_sites to desired value
+	b. run the whole thing
+	c. under the ...\simulator-master\sim, should generate a new "your_new_data.pk" file with downsized data
+	d. copy the .pk file to ...\simulator-master\sim\lib
+	e. in experiments.ipynb, change the line "mob_settings = 'lib/your_new_data.pk'"
+
+2. change the sites types from 5 to 4 (last row is now percentage of essential workers)
+	in mobilitysim.py:
+		% a. 354 "self.num_site_types = self.mob_rate_per_age_per_type.shape[1]"
+			→ "self.num_site_types = self.mob_rate_per_age_per_type.shape[1]-1"
+		 b. 48,98 "tot_mob_rate = np.sum(mob_rate_per_type)"
+			→ "tot_mob_rate = np.sum(mob_rate_per_type[0:3])"
+		% c. 49 "site_type_prob = mob_rate_per_type / tot_mob_rate"
+			→ "site_type_prob = mob_rate_per_type[0:3] / tot_mob_rate"
+		% d. 108 "for k in range(len(mob_rate_per_type))"
+			→ "for k in range(len(mob_rate_per_type)-1)"
+		% e. 326 "self.num_site_types = len(mob_rate_per_type)"
+			→ "self.num_site_types = len(mob_rate_per_type)-1"
+		f. add the following lines after 122 "site_prob = site_prox[s_args] / site_prox[s_args].sum()"
+			"if k==(len(mob_rate_per_type)-1):
+			            site_prob = site_prox[s_args]-site_prox[s_args]"
+		g. add the following lines after 66 "site_prob = site_prox[s_args] / site_prox[s_args].sum()"
+			"if k==(len(mob_rate_per_type)-1):
+			            site_prob = site_prox[s_args]-site_prox[s_args]"
+		h. overwirte the following lines 124 "site = s_args[s_idx]"
+			by "if np.sum(site_prob)!= 0:
+			                site = s_args[s_idx]"
+		i. add the following 296 in the  _init_  after "num_age_groups=None, "
+			"essen_ratio_to_non_essen_per_age = None, 
+               			 essen_mob_rate_increase = None,
+                		 essen_dur_time_increase = None,"
+		j. add in the () 338, 344 
+			"essen_ratio_to_non_essen_per_age is not None and essen_mob_rate_increase is not None and 
+                    		 essen_dur_time_increase is not None"
+		k. add attributes in mob object 
+		
+	in dynamics.py:
+		% a. add after 58 "self.mob_rate_per_age_per_type = mob.mob_rate_per_age_per_type"
+		b. add following lines under 870, 841 "is_i_not_compliant = self.measure_list.is_contained(
+		            ComplianceForAllMeasure, t=t-self.test_smart_delta, j=i)"
+		       "site_prob = self.mob_rate_per_age_per_type[self.people_age[i]]
+        			 if abs(site_prob[4])<1e-3:
+		            		 is_i_not_compliant = True"
+
+	in measures.py:
+		a. 28 under classMeasure def _init_, add "t_window=Interval(*t_window)"
+		b. 216 under SocialDistancingSmartTracing def _init_, add "t_window=Interval(*t_window)"
+		
+4. in dynamics.py
+	change the # age group to be aligned with fatality rate and hosipitality rate align with the country code
+
+
+variables to change:
+	variety_per_type, num_site_types, n_sites
+	mob_rate_per_age_per_type, mob_rate_per_type
+
+
+questions:
+	a. All measures in the measures.py take in only numbers, not object, not arrays,
+	    How to add 
+	b. 

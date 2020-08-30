@@ -1,0 +1,4 @@
+node["office"]
+node["shop"]
+way["office"]
+way["shop"]

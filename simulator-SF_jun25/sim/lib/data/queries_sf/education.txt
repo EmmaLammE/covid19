@@ -1,0 +1,6 @@
+way["amenity"="school"]
+way["building"="university"]
+way["amenity"="research_institute"]
+node["amenity"="school"]
+node["building"="university"]
+node["amenity"="research_institute"]
